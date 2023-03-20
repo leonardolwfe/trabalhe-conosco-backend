@@ -1,0 +1,207 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") 
+}
+
+model TipoCurso {
+  idTipoCurso Int @id @default(autoincrement())
+  nomeTipoCurso String 
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  escolaridades Escolaridade[]
+  vagas Vaga[]
+}
+
+model Escolaridade {
+  idEscolaridade  Int @default(autoincrement()) @id
+  instituicao String
+  nomeEscolaridade String
+  cnpjInstituicao String
+  dataInicio  DateTime
+  dataFinal DateTime
+  usuario Usuario @relation(fields: [idUsuario], references: [idUsuario])
+  idUsuario Int 
+  tipoCurso TipoCurso @relation(fields: [idTipoCurso], references: [idTipoCurso])
+  idTipoCurso Int
+  criadoEm DateTime @default(now()) 
+  atualizadoEm  DateTime @default(now()) @updatedAt()
+}
+
+model Usuario {
+  idUsuario  Int  @default(autoincrement()) @id
+  nome  String  
+  usuario  String @unique
+  email String  @unique
+  provedor  String
+  senha String  
+  resetarSenhaToken String
+  confirmacaoToken  String
+  confirmado  Boolean @default(false)
+  dadoPessoal DadoPessoal @relation(fields: [idDadoPessoal], references: [idDadoPessoal])
+  idDadoPessoal Int @unique
+  endereco Endereco @relation(fields: [idEndereco], references: [idEndereco])
+  idEndereco  Int @unique
+  interesse Interesse @relation(fields: [idInteresse], references: [idInteresse])
+  idInteresse Int @unique
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  escolaridades Escolaridade[]
+  recrutador Recrutador?
+}
+
+model EstadoCivil {
+  idEstadoCivil Int @default(autoincrement()) @id
+  nomeEstadoCivil String
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  dadosPessoais DadoPessoal[]
+}
+
+model Sexo {
+  idSexo Int @default(autoincrement()) @id
+  nomeSexo  String
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  dadosPessoais DadoPessoal[]
+}
+
+model DadoPessoal {
+  idDadoPessoal Int @default(autoincrement()) @id
+  nascimento  DateTime
+  celular String
+  telefone  String
+  sexo  Sexo  @relation(fields: [idSexo], references: [idSexo])
+  idSexo  Int
+  estadoCivil EstadoCivil @relation(fields: [idEstadoCivil],references: [idEstadoCivil])
+  idEstadoCivil Int
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  usuario Usuario?
+}
+
+model Estado {
+  idEstado  Int @default(autoincrement()) @id
+  nomeEstado  String
+  siglaEstado String
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  cidades Cidade[]
+}
+
+model Cidade {
+  idCidade  Int @default(autoincrement()) @id
+  nomeCidade  String
+  estado Estado @relation(fields: [idEstado], references: [idEstado])
+  idEstado  Int
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  enderecos Endereco[]
+  interesses Interesse[]
+  vagas Vaga[]
+}
+
+model Endereco {
+  idEndereco  Int @default(autoincrement()) @id
+  bairro String
+  rua String
+  cep String
+  numero Int
+  cidade Cidade @relation(fields: [idCidade], references: [idCidade])
+  idCidade  Int
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  usuario Usuario?
+}
+
+model Interesse {
+  idInteresse Int @default(autoincrement()) @id
+  disponiTrocaCidade  Boolean
+  cidade Cidade @relation(fields: [idCidade], references: [idCidade])
+  idCidade  Int
+  idCargo Int
+  idProfissao Int
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  profissoes Profissao[]
+  cargos Cargo[]
+  usuario Usuario?
+}
+
+model Cargo {
+  idCargo Int @default(autoincrement()) @id
+  nomeCargo String
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  interesses Interesse[]
+  vagas Vaga[]
+}
+
+model Profissao {
+  idProfissao Int @default(autoincrement()) @id
+  nomeProfissao String
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  interesses Interesse[]
+  vagas Vaga[]
+}
+
+model Periodo {
+  idPeriodo Int @default(autoincrement()) @id
+  nomePeriodo String
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  vagas Vaga[]
+}
+
+model Recrutador {
+  idRecrutador  Int @default(autoincrement()) @id
+  nomeRecrutador String
+  matriculaRecrutador String
+  empresa Empresa @relation(fields: [idEmpresa], references: [idEmpresa])
+  idEmpresa Int
+  usuario Usuario @relation(fields: [idUsuario], references: [idUsuario])
+  idUsuario Int @unique
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+}
+
+model Empresa {
+  idEmpresa Int @default(autoincrement()) @id
+  nomeEmpresa String
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+  recrutadores Recrutador[]
+  vagas Vaga[]
+}
+
+model Vaga {
+  idVaga  Int @default(autoincrement()) @id
+  cargo Cargo @relation(fields: [idCargo], references: [idCargo])
+  idCargo Int
+  profissao Profissao @relation(fields: [idProfissao], references: [idProfissao])
+  idProfissao Int
+  cidade Cidade @relation(fields: [idCidade], references: [idCidade])
+  idCidade  Int
+  empresa Empresa @relation(fields: [idEmpresa], references: [idEmpresa])
+  idEmpresa Int
+  periodo Periodo @relation(fields: [idPeriodo], references: [idPeriodo])
+  idPeriodo Int
+  tipoCurso TipoCurso @relation(fields: [idTipoCurso], references: [idTipoCurso])
+  idTipoCurso Int
+  descricao String
+  criadoPor  String  
+  atualizadoPor  String
+  criadoEm  DateTime  @default(now())
+  atualizadoEm  DateTime  @default(now()) @updatedAt()
+}
