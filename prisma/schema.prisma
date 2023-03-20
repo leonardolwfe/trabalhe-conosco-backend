@@ -129,8 +129,6 @@ model Interesse {
   disponiTrocaCidade  Boolean
   cidade Cidade @relation(fields: [idCidade], references: [idCidade])
   idCidade  Int
-  idCargo Int
-  idProfissao Int
   criadoEm  DateTime  @default(now())
   atualizadoEm  DateTime  @default(now()) @updatedAt()
   profissoes Profissao[]
