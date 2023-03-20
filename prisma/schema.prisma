@@ -58,6 +58,9 @@ model Usuario {
   atualizadoEm  DateTime  @default(now()) @updatedAt()
   escolaridades Escolaridade[]
   recrutador Recrutador?
+
+  vagasCriadas Vaga[] @relation(name: "CriadoPorUsuario")
+  vagasAtualizadas Vaga[] @relation(name: "AtualizadoPorUsuario")
 }
 
 model EstadoCivil {
@@ -198,8 +201,10 @@ model Vaga {
   tipoCurso TipoCurso @relation(fields: [idTipoCurso], references: [idTipoCurso])
   idTipoCurso Int
   descricao String
-  criadoPor  String  
-  atualizadoPor  String
+  criadoPor  Int
+  CriadoPor Usuario @relation(fields: [criadoPor], references: [idUsuario], name: "CriadoPorUsuario")  
+  atualizadoPor  Int
+  AtualizadoPor Usuario @relation(fields: [atualizadoPor], references: [idUsuario], name: "AtualizadoPorUsuario")  
   criadoEm  DateTime  @default(now())
   atualizadoEm  DateTime  @default(now()) @updatedAt()
 }
